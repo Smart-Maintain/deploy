@@ -1,0 +1,18 @@
+[submodule "submodules/backend"]
+	path = submodules/backend
+	url = https://github.com/Smart-Maintain/backend
+[submodule "submodules/discovery"]
+	path = submodules/discovery
+	url = https://github.com/Smart-Maintain/discovery-service
+[submodule "submodules/gateway"]
+	path = submodules/gateway
+	url = https://github.com/Smart-Maintain/gateway-service
+[submodule "submodules/equipement"]
+	path = submodules/equipement
+	url = https://github.com/Smart-Maintain/equipement-service
+[submodule "submodules/frontend"]
+	path = submodules/frontend
+	url = https://github.com/Smart-Maintain/SMART-MAINTAIN-FRONTEND
+[submodule "submodules/identity"]
+	path = submodules/identity
+	url = https://github.com/Smart-Maintain/identity-service
