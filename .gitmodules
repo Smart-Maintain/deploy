@@ -16,3 +16,6 @@
 [submodule "submodules/identity"]
 	path = submodules/identity
 	url = https://github.com/Smart-Maintain/identity-service
+[submodule "submodules/prediction"]
+	path = submodules/prediction
+	url = https://github.com/Smart-Maintain/prediction-service
