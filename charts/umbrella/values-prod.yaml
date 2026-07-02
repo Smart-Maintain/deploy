@@ -5,7 +5,7 @@ postgres:
 discovery:
   image:
     repository: ghcr.io/smart-maintain/discovery-service
-    tag: latest
+    tag: 82d602d
 
 identity:
   image:
