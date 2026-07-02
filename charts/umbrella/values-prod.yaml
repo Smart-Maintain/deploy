@@ -10,7 +10,7 @@ discovery:
 identity:
   image:
     repository: ghcr.io/smart-maintain/identity-service
-    tag: latest
+    tag: e95a6d4
 
 equipement:
   image:
