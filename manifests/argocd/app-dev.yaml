@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Smart-Maintain/deploy
-    targetRevision: dev
+    targetRevision: main
     path: charts/umbrella
     helm:
       valueFiles:
