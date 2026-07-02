@@ -15,7 +15,7 @@ identity:
 equipement:
   image:
     repository: ghcr.io/smart-maintain/equipement-service
-    tag: latest
+    tag: 0389d55
 
 gateway:
   image:
