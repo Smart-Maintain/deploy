@@ -1,0 +1,180 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            {{- if .Values.env }}
+            {{- toYaml .Values.env | nindent 12 }}
+            {{- end }}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds }}
+            periodSeconds: 15
+            failureThreshold: 5
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds }}
+            periodSeconds: 10
+            failureThreshold: 3
+
+# ---
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: {{ .Release.Name }}
+#   labels:
+#     app: {{ .Release.Name }}
+#     version: {{ .Values.image.tag | quote }}
+# spec:
+#   replicas: {{ .Values.replicaCount }}
+#   selector:
+#     matchLabels:
+#       app: {{ .Release.Name }}
+#   template:
+#     metadata:
+#       labels:
+#         app: {{ .Release.Name }}
+#         version: {{ .Values.image.tag | quote }}
+#       annotations:
+#         vault.hashicorp.com/agent-inject: "true"
+#         vault.hashicorp.com/role: "app-role"
+#         vault.hashicorp.com/agent-inject-secret-config: "secret/data/{{ .Release.Name }}"
+#     spec:
+#       containers:
+#         - name: {{ .Release.Name }}
+#           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+#           imagePullPolicy: Always
+#           ports:
+#             - containerPort: {{ .Values.service.port }}
+#           resources:
+#             requests:
+#               cpu: {{ .Values.resources.requests.cpu }}
+#               memory: {{ .Values.resources.requests.memory }}
+#             limits:
+#               cpu: {{ .Values.resources.limits.cpu }}
+#               memory: {{ .Values.resources.limits.memory }}
+#           livenessProbe:
+#             httpGet:
+#               path: {{ .Values.healthCheck.path }}
+#               port: {{ .Values.service.port }}
+#             initialDelaySeconds: 30
+#             periodSeconds: 10
+#             failureThreshold: 3
+#           readinessProbe:
+#             httpGet:
+#               path: {{ .Values.healthCheck.path }}
+#               port: {{ .Values.service.port }}
+#             initialDelaySeconds: 10
+#             periodSeconds: 5
+#             failureThreshold: 3
+
+# ---
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: {{ include "gateway.fullname" . }}
+#   labels:
+#     {{- include "gateway.labels" . | nindent 4 }}
+# spec:
+#   {{- if not .Values.autoscaling.enabled }}
+#   replicas: {{ .Values.replicaCount }}
+#   {{- end }}
+#   selector:
+#     matchLabels:
+#       {{- include "gateway.selectorLabels" . | nindent 6 }}
+#   template:
+#     metadata:
+#       {{- with .Values.podAnnotations }}
+#       annotations:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}
+#       labels:
+#         {{- include "gateway.labels" . | nindent 8 }}
+#         {{- with .Values.podLabels }}
+#         {{- toYaml . | nindent 8 }}
+#         {{- end }}
+#     spec:
+#       {{- with .Values.imagePullSecrets }}
+#       imagePullSecrets:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}
+#       serviceAccountName: {{ include "gateway.serviceAccountName" . }}
+#       {{- with .Values.podSecurityContext }}
+#       securityContext:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}
+#       containers:
+#         - name: {{ .Chart.Name }}
+#           {{- with .Values.securityContext }}
+#           securityContext:
+#             {{- toYaml . | nindent 12 }}
+#           {{- end }}
+#           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+#           imagePullPolicy: {{ .Values.image.pullPolicy }}
+#           ports:
+#             - name: http
+#               containerPort: {{ .Values.service.port }}
+#               protocol: TCP
+#           {{- with .Values.livenessProbe }}
+#           livenessProbe:
+#             {{- toYaml . | nindent 12 }}
+#           {{- end }}
+#           {{- with .Values.readinessProbe }}
+#           readinessProbe:
+#             {{- toYaml . | nindent 12 }}
+#           {{- end }}
+#           {{- with .Values.resources }}
+#           resources:
+#             {{- toYaml . | nindent 12 }}
+#           {{- end }}
+#           {{- with .Values.volumeMounts }}
+#           volumeMounts:
+#             {{- toYaml . | nindent 12 }}
+#           {{- end }}
+#       {{- with .Values.volumes }}
+#       volumes:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}
+#       {{- with .Values.nodeSelector }}
+#       nodeSelector:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}
+#       {{- with .Values.affinity }}
+#       affinity:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}
+#       {{- with .Values.tolerations }}
+#       tolerations:
+#         {{- toYaml . | nindent 8 }}
+#       {{- end }}

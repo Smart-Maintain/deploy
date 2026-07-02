@@ -1,0 +1,53 @@
+apiVersion: v2
+name: umbrella
+description: Umbrella chart for smartmaintain
+version: 0.1.0
+dependencies:
+  - name: postgres
+    version: "0.1.0"
+    repository: "file://../postgres"
+  - name: discovery
+    version: "0.1.0"
+    repository: "file://../discovery"
+  - name: identity
+    version: "0.1.0"
+    repository: "file://../identity"
+  - name: equipement
+    version: "0.1.0"
+    repository: "file://../equipement"
+  - name: gateway
+    version: "0.1.0"
+    repository: "file://../gateway"
+  - name: prediction
+    version: "0.1.0"
+    repository: "file://../prediction"
+  - name: frontend
+    version: "0.1.0"
+    repository: "file://../frontend"
+
+# ---
+
+# apiVersion: v2
+# name: umbrella
+# description: Umbrella chart for all microservices
+# type: application
+# version: 0.1.0
+# dependencies:
+#   - name: frontend
+#     version: "0.1.0"
+#     repository: "file://../frontend"
+#   - name: discovery
+#     version: "0.1.0"
+#     repository: "file://../discovery"
+#   - name: equipement
+#     version: "0.1.0"
+#     repository: "file://../equipement"
+#   - name: gateway
+#     version: "0.1.0"
+#     repository: "file://../gateway"
+#   - name: identity
+#     version: "0.1.0"
+#     repository: "file://../identity"
+#   - name: prediction
+#     version: "0.1.0"
+#     repository: "file://../prediction"

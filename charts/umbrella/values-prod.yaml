@@ -1,0 +1,37 @@
+postgres:
+  db:
+    name: smartmaintain_db
+
+discovery:
+  image:
+    repository: ghcr.io/smart-maintain/discovery-service
+    tag: latest
+
+identity:
+  image:
+    repository: ghcr.io/smart-maintain/identity-service
+    tag: latest
+
+equipement:
+  image:
+    repository: ghcr.io/smart-maintain/equipement-service
+    tag: latest
+
+gateway:
+  image:
+    repository: ghcr.io/smart-maintain/gateway-service
+    tag: latest
+  ingress:
+    host: placeholder.nip.io
+
+prediction:
+  image:
+    repository: ghcr.io/smart-maintain/prediction-service
+    tag: latest
+
+frontend:
+  image:
+    repository: ghcr.io/smart-maintain/frontend-service
+    tag: latest
+  ingress:
+    host: placeholder.nip.io
