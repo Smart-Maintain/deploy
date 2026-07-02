@@ -1,0 +1,33 @@
+charts/umbrella/values-prod.local.yaml
+azure/
+charts/velero/
+ansible/inventory/hosts.yml
+
+# Local-only values with IPs
+charts/umbrella/values-prod.local.yaml
+charts/umbrella/values-dev.local.yaml
+
+# Velero — deferred, contains Azure credentials
+charts/velero/
+
+# Helm generated files
+charts/*/charts/
+charts/umbrella/Chart.lock
+
+# Ansible
+ansible/*.retry
+ansible/inventory/group_vars/*/secrets.yaml
+
+# Kubeconfigs
+*.kubeconfig
+prod-kubeconfig.yaml
+dev-kubeconfig.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/settings.json
+*.swp
