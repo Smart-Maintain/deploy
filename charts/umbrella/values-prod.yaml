@@ -32,6 +32,6 @@ prediction:
 frontend:
   image:
     repository: ghcr.io/smart-maintain/frontend-service
-    tag: latest
+    tag: 88fde48
   ingress:
     host: placeholder.nip.io
