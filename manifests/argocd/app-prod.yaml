@@ -1,21 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
   name: app-prod
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/Smart-Maintain/deploy
+    repoURL: https://github.com/smart-maintain/deploy.git
     targetRevision: main
     path: charts/umbrella
     helm:
       valueFiles:
         - values-prod.yaml
   destination:
-    server: https://10.0.0.5:6443    # prod k3s API
+    server: https://10.1.0.4:6443
     namespace: default
   syncPolicy:
     automated:
       prune: true
-      selfHeal: false    # prod requires manual approval
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
