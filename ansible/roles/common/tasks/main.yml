@@ -1,0 +1,156 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install base packages
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - jq
+      - htop
+      - ufw
+    state: present
+
+- name: Set swapoff (k3s requirement)
+  command: swapoff -a
+  changed_when: false
+
+- name: Disable swap permanently
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: Load br_netfilter module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Persist br_netfilter on boot
+  copy:
+    dest: /etc/modules-load.d/k3s.conf
+    content: "br_netfilter\n"
+
+- name: Set kernel parameters for k3s
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  loop:
+    - { name: net.bridge.bridge-nf-call-iptables, value: "1" }
+    - { name: net.bridge.bridge-nf-call-ip6tables, value: "1" }
+    - { name: net.ipv4.ip_forward, value: "1" }
+
+- name: Install Docker 
+  block:
+    # - name: Add Docker GPG key
+    #   apt_key:
+    #     url: https://download.docker.com/linux/ubuntu/gpg
+    #     state: present
+
+    # - name: Add Docker repo
+    #   apt_repository:
+    #     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    #     state: present
+
+    - name: Create keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Download Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch={{ ansible_architecture | replace('x86_64','amd64') | replace('aarch64','arm64') }}
+          signed-by=/etc/apt/keyrings/docker.asc]
+          https://download.docker.com/linux/ubuntu
+          {{ ansible_distribution_release }} stable
+        filename: docker
+        state: present
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Docker packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin 
+          - docker-compose-plugin
+        state: present
+
+    - name: Add azureuser to docker group
+      user:
+        name: azureuser
+        groups: docker
+        append: yes
+
+    - name: Enable and start Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+# - name: Install Docker (for SonarQube on dev, and local builds)
+#   block:
+#     - name: Create keyrings directory
+#       file:
+#         path: /etc/apt/keyrings
+#         state: directory
+#         mode: '0755'
+
+#     - name: Download Docker GPG key
+#       get_url:
+#         url: https://download.docker.com/linux/ubuntu/gpg
+#         dest: /etc/apt/keyrings/docker.asc
+#         mode: '0644'
+
+#     - name: Add Docker repo
+#       apt_repository:
+#         repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+#         state: present
+#         filename: docker
+#         update_cache: yes
+
+#     - name: Install Docker packages
+#       apt:
+#         name:
+#           - docker-ce
+#           - docker-ce-cli
+#           - containerd.io
+#           - docker-buildx-plugin 
+#           - docker-compose-plugin
+#         state: present
+#         update_cache: yes
+
+#     - name: Add azureuser to docker group
+#       user:
+#         name: azureuser
+#         groups: docker
+#         append: yes
+
+#     - name: Enable and start Docker
+#       systemd:
+#         name: docker
+#         enabled: yes
+#         state: started

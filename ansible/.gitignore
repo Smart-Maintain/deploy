@@ -1,0 +1,12 @@
+# Ansible retry files
+*.retry
+
+# Any vars file with real passwords
+group_vars/all/vault.yml
+inventory/group_vars/*/secrets.yml
+
+# SSH keys if accidentally placed here
+*.pem
+*.key
+id_rsa
+id_rsa.pub

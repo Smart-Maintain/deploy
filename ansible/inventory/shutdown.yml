@@ -1,0 +1,63 @@
+# ---
+# - name: Shutdown Ubuntu Servers
+#   hosts: ubuntu_servers
+#   become: true
+#   gather_facts: false
+
+#   tasks:
+#     # - name: Ensure the host is actually Ubuntu before proceeding
+#     #   ansible.builtin.gather_facts:
+#     #     gather_subset:
+#     #       - os_family
+
+#     - name: Halt the system immediately
+#       ansible.builtin.command: /sbin/shutdown -h now
+#       async: 1
+#       poll: 0
+#       # when: ansible_os_family == "Debian"
+
+#     - name: Wait for the server to go down
+#       ansible.builtin.wait_for_connection:
+#         delay: 5
+#         timeout: 60
+#         state: absent
+#       # when: ansible_os_family == "Debian"
+
+# ---
+# - name: Shutdown Servers Immediately
+#   hosts: all
+#   become: true
+#   gather_facts: false
+
+#   tasks:
+#     - name: Issue shutdown command
+#       ansible.builtin.command: /sbin/shutdown -h now
+#       async: 1
+#       poll: 0
+
+#     - name: Wait for machine to go down
+#       ansible.builtin.wait_for_connection:
+#         delay: 5
+#         timeout: 60
+#         state: absent
+
+---
+- name: Shutdown Servers Immediately
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Issue shutdown command
+      ansible.builtin.command: /sbin/shutdown -h now
+      async: 1
+      poll: 0
+
+    - name: Wait for SSH port 22 to close
+      ansible.builtin.wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        state: stopped
+        delay: 5
+        timeout: 60
+      delegate_to: localhost

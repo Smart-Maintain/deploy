@@ -1,0 +1,45 @@
+- name: Create Vault data directory
+  file:
+    path: /opt/vault/data
+    state: directory
+    owner: 100        # vault container user
+    group: 1000
+    mode: '0750'
+
+- name: Create Vault config
+  copy:
+    dest: /opt/vault/config.hcl
+    content: |
+      ui = true
+      storage "file" {
+        path = "/vault/data"
+      }
+      listener "tcp" {
+        address     = "0.0.0.0:8200"
+        tls_disable = true   # TLS handled by NSG + internal only for school project
+      }
+      api_addr = "http://{{ ansible_default_ipv4.address }}:8200"
+
+- name: Run Vault container
+  docker_container:
+    name: vault
+    image: hashicorp/vault:{{ vault_version }}
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "8200:8200"
+    volumes:
+      - /opt/vault/data:/vault/data
+      - /opt/vault/config.hcl:/vault/config/config.hcl
+    capabilities:
+      - IPC_LOCK
+    command: vault server -config=/vault/config/config.hcl
+
+- name: Wait for Vault to be up
+  uri:
+    url: http://localhost:8200/v1/sys/health
+    status_code: [200, 429, 472, 473, 501, 503]
+  register: vault_health
+  retries: 10
+  delay: 5
+  until: vault_health.status in [200, 429, 472, 473, 501, 503]
