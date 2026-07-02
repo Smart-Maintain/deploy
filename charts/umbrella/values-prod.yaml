@@ -20,7 +20,7 @@ equipement:
 gateway:
   image:
     repository: ghcr.io/smart-maintain/gateway-service
-    tag: latest
+    tag: 20009c7
   ingress:
     host: placeholder.nip.io
 
